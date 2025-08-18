@@ -2910,15 +2910,17 @@ void EditorNode::_edit_current(bool p_skip_foreign, bool p_skip_inspector_update
 
 		ObjectID editor_owner_id = editor_owner->get_instance_id();
 		if (main_plugin && !skip_main_plugin) {
-			// Special case if current_obj is a script
+			// Special case if current_obj is a script.
 			Script *current_script = Object::cast_to<Script>(current_obj);
 			if (current_script) {
-				// Only update main editor screen if using in-engine editor
-				if (current_script->is_built_in() || (!EDITOR_GET("text_editor/external/use_external_editor") && !current_script->get_language()->overrides_external_editor())) {
-					editor_main_screen->select(plugin_index);
-				}
+				if (!changing_scene) {
+					// Only update main editor screen if using in-engine editor.
+					if (current_script->is_built_in() || (!bool(EDITOR_GET("text_editor/external/use_external_editor")) && !current_script->get_language()->overrides_external_editor())) {
+						editor_main_screen->select(plugin_index);
+					}
 
-				main_plugin->edit(current_script);
+					main_plugin->edit(current_script);
+				}
 			} else if (main_plugin != editor_plugin_screen) {
 				// Unedit previous plugin.
 				editor_plugin_screen->edit(nullptr);
